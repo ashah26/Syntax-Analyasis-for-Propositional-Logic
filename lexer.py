@@ -1,4 +1,5 @@
 import string
+import re
 UPPER_CASE = set(string.ascii_uppercase)
 
 class Location:
@@ -41,8 +42,13 @@ class Lexer:
         # the following assignment and if statement are only to allow the test pass. they need to be removed
         inputtext = self.text
         tokenlist = []
+        inputtext = inputtext.replace("\n", "")
+        if " " in inputtext:
+            inputtext = inputtext.split(" ")
+
         for c in inputtext:
-            if c == 'Q':
+            p = re.compile('[a-zA-Z0-1]+')
+            if p.match(c):
                  tokenlist.append(Token(Location(self.line, self.col), TokenKind.ID))
                  self.col += 1
             elif c == '(':

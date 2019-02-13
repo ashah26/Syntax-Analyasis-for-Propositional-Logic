@@ -5,9 +5,10 @@ from parser import Parser
 # f = open("input.txt")
 # linecount = 1
 # for line in f:
+#     print(line)
 #     l = Lexer(line, linecount).tokenize()
 #     linecount = linecount+1
-    # print(l.kind)
+#     print(l)
 
 class Test(unittest.TestCase):
     def test1(self):
@@ -16,15 +17,14 @@ class Test(unittest.TestCase):
         self.assertEqual(l.kind, [TokenKind.ID])
 
     def test2(self):
-        tokelist = Lexer('Q').tokenize()
-        #parse_tree = Parser().parse(tokelist)
-        # some assertion goes here
+        tokenlist = Lexer('Q').tokenize()
+        parse_tree = Parser(tokenlist).parse()
+        self.assertTrue(True)
 
     def test3(self):
-        l = Lexer('!Q')
-        ll = l.tokenize()
-        print(l)
-        self.assertTrue(l.validatelexer(ll, [TokenKind.NOT, TokenKind.ID]))
+        tokenlist = Lexer('Q').tokenize()
+        parse_tree = Parser().parse(tokenlist)
+        self.assertTrue(True)
 
     def test4(self):
         l = Lexer(')Q')
@@ -39,7 +39,7 @@ class Test(unittest.TestCase):
         self.assertTrue(l.validatelexer(ll, [TokenKind.NOT, TokenKind.ID]))
 
     def test6(self):
-        l = Lexer(')Q')
+        l = Lexer('Q')
         ll = l.tokenize()
         print(l)
         self.assertTrue(l.validatelexer(ll, [TokenKind.RPAR, TokenKind.ID]))
