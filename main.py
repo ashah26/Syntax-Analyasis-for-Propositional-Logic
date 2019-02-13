@@ -17,12 +17,12 @@ class Test(unittest.TestCase):
         self.assertEqual(l.kind, [TokenKind.ID])
 
     def test2(self):
-        tokenlist = Lexer('Q').tokenize()
+        tokenlist = Lexer('!Q').tokenize()
         parse_tree = Parser(tokenlist).parse()
         self.assertTrue(True)
 
     def test3(self):
-        tokenlist = Lexer('Q').tokenize()
+        tokenlist = Lexer('( P \/ Q ) , ( X => Y )').tokenize()
         parse_tree = Parser().parse(tokenlist)
         self.assertTrue(True)
 

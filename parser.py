@@ -18,13 +18,11 @@ class Parser:
         self.parserList = []
         self.indexCounter = 0
         self.tokenlist = []
-        self.divisor = 0
 
     def parse(self, tokenList):
 
         self.tokenlist = tokenList
         self.indexCounter = 0
-        self.divisor = len(tokenList)
 
         for token in tokenList:
             print("While parsing : ", token.kind)
@@ -43,7 +41,7 @@ class Parser:
         self.proposition()
         self.more_propositions()
         print("Parser List: ", self.parserList)
-        raise NotImplementedError
+        # raise NotImplementedError
 
     def more_propositions(self):
         # print(sys.getframe().f_code.co_name)
@@ -63,7 +61,10 @@ class Parser:
 
         self.parserList.append("proposition")
         # if atomic else compound
-        self.atomic()
+        if self.isCompound(self.indexCounter):
+           self.compound()
+        else:
+            self.atomic()
 
         # raise NotImplementedError
 
@@ -72,7 +73,7 @@ class Parser:
 
         self.parserList.append("atomic")
 
-        if self.isAtomic():
+        if self.isAtomic(self.indexCounter):
             self.indexCounter += 1
             self.parserList.append("ID")
 
@@ -86,12 +87,16 @@ class Parser:
         if self.indexCounter < len(self.tokenlist):
             if self.tokenlist[self.indexCounter].kind == 3:
                 self.parserList.append("not")
+                self.indexCounter += 1
                 self.proposition()
             elif self.tokenlist[self.indexCounter].kind == 1:
                 self.parserList.append("LPAR")
+                self.indexCounter += 1
                 self.proposition()
                 self.parserList.append("RPAR")
-            elif self.isAtomic() and self.isConnective():
+                self.indexCounter += 1
+            elif self.isAtomic(self.indexCounter) and self.isConnective(self.indexCounter+1) \
+                    and self.indexCounter+2 < len(self.tokenlist):
                 self.atomic()
                 self.connective()
                 self.proposition()
@@ -103,7 +108,7 @@ class Parser:
 
         self.parserList.append("connective")
 
-        if self.isConnective():
+        if self.isConnective(self.indexCounter):
             if self.tokenlist[self.indexCounter].kind == 4:
                 self.indexCounter += 1
                 self.parserList.append("AND")
@@ -120,20 +125,32 @@ class Parser:
         # raise NotImplementedError
 
     # add more methods if needed
-    def isAtomic(self):
+    def isAtomic(self, index):
 
-        if self.indexCounter < len(self.tokenlist) and self.tokenlist[self.indexCounter].kind == 0:
+        if index < len(self.tokenlist) and self.tokenlist[index].kind == 0:
             return True
         return False
 
-    def isConnective(self):
-        if self.indexCounter < len(self.tokenlist):
-            if self.tokenlist[self.indexCounter].kind == 4:
+    def isConnective(self, index):
+        if index < len(self.tokenlist):
+            if self.tokenlist[index].kind == 4:
                 return True
-            elif self.tokenlist[self.indexCounter].kind == 5:
+            elif self.tokenlist[index].kind == 5:
                 return True
-            elif self.tokenlist[self.indexCounter].kind == 6:
+            elif self.tokenlist[index].kind == 6:
                 return True
-            elif self.tokenlist[self.indexCounter].kind == 7:
+            elif self.tokenlist[index].kind == 7:
                 return True
+        return False
+
+    def isCompound(self, index):
+        if index < len(self.tokenlist):
+            if self.tokenlist[index].kind == 3:
+                return True
+            if self.tokenlist[index].kind == 1:
+                return True
+            if self.isAtomic(index):
+               if self.isConnective(index+1):
+                   if index+2 < len(self.tokenlist):
+                       return True
         return False
