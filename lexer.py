@@ -42,7 +42,6 @@ class Lexer:
         # the following assignment and if statement are only to allow the test pass. they need to be removed
         inputtext = self.text
         tokenlist = []
-        inputtext = inputtext.replace("\n", "")
         if " " in inputtext:
             inputtext = inputtext.split(" ")
 
