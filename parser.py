@@ -1,6 +1,9 @@
 from lexer import Location, Lexer
 import sys
 import re
+from pysmt.shortcuts import Symbol, And, Or, Implies, Iff, is_sat,Not
+from pythonds.basic.stack import Stack
+
 
 
 class VariableType:
@@ -20,8 +23,11 @@ class Parser:
         self.tokenlist = []
         self.errorflag = False
         self.lexerlist = []
+        # self.top = -1
+        # self.array = []
+        # self.output = []
 
-    def parse(self, tokenList):
+    def parse(self, tokenList, line):
 
         self.tokenlist = tokenList
         self.indexCounter = 0
@@ -53,10 +59,100 @@ class Parser:
 
         if not self.errorflag:
             print("Parser: ", self.parserList)
+
+            postFixList = self.convertToPostfix(self.lexerlist)
+
+            self.checkSatisfiability(postFixList)
+
+
         else:
             print("Syntax error at line: ", self.tokenlist[self.indexCounter].loc.line, " and column: ",
                   self.tokenlist[self.indexCounter].loc.col)
         # raise NotImplementedError
+
+    #
+    # def isEmpty(self):
+    #     return  True if self.top == -1 else False
+    #
+    # def peek(self):
+    #     return self.array[-1]
+    #
+    # def pop(self):
+    #     if not self.isEmpty():
+    #         self.top -=1
+    #         return self.array.pop()
+    #     else:
+    #         return "$"
+    #
+    # def push(self, op):
+    #
+
+    def convertToPostfix(self, lexerlist):
+        opStack = Stack()
+        postfixList = []
+
+        for token in self.lexerlist:
+            if token == "ID":
+                postfixList.append(token)
+            elif token == 'LPAR':
+                opStack.push(token)
+            elif token == 'AND':
+                opStack.push(token)
+            elif token == 'OR':
+                opStack.push(token)
+            elif token == 'IFF':
+                opStack.push(token)
+            elif token == 'IMPLIES':
+                opStack.push(token)
+            elif token == 'NOT':
+                opStack.push(token)
+            elif token == 'RPAR':
+                topToken = opStack.pop()
+                while topToken != 'LPAR':
+                    postfixList.append(topToken)
+                    topToken = opStack.pop()
+            else:
+                while not opStack.isEmpty():
+                    postfixList.append(opStack.pop())
+                opStack.push(token)
+
+        while not opStack.isEmpty():
+            postfixList.append(opStack.pop())
+
+        print ("Postfix expression: ", postfixList)
+        return postfixList
+
+    def checkSatisfiability(self, postFixList):
+        propStack = Stack()
+
+        for op in postFixList:
+            if op == 'ID':
+                propStack.push(Symbol(op))
+            elif op == 'NOT':
+                propStack.push(Not(propStack.pop()))
+            elif op == 'AND' or op == 'COMMA':
+                p2 = propStack.pop()
+                p1 = propStack.pop()
+                propStack.push(And(p1, p2))
+            elif op == 'OR':
+                p2 = propStack.pop()
+                p1 = propStack.pop()
+                propStack.push(Or(p1, p2))
+            elif op == 'IFF':
+                p2 = propStack.pop()
+                p1 = propStack.pop()
+                propStack.push(Iff(p1, p2))
+            elif op == 'IMPLIES':
+                p2 = propStack.pop()
+                p1 = propStack.pop()
+                propStack.push(Implies(p1, p2))
+
+        if propStack.size() == 1:
+            p3 = propStack.pop()
+            print ("Expression for satisfiability:", p3)
+            print ("Iis sat or not : ", is_sat(p3))
+        else:
+            print ("error while checking satifiability, stack size: ", propStack.size())
 
     def match(self, token):
 
