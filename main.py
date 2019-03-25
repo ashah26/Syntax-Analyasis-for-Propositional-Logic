@@ -11,8 +11,16 @@ for line in f:
     print("Proposition: ", line)
     tokenlist = Lexer(line, linecount).tokenize()
     linecount = linecount+1
-    parse_tree = Parser().parse(tokenlist)
+    parse_tree = Parser().parse(tokenlist, line)
     print("*********************")
+
+# line = "( P /\ ! Q ) , ( ! P <=> ! Q )"
+# print("Proposition: ", line)
+# tokenlist = Lexer(line, 0).tokenize()
+# parse_tree = Parser().parse(tokenlist, line)
+# print("*********************")
+
+
 # class Test(unittest.TestCase):
 #     def test1(self):
 #         l = Lexer('Q').tokenize()

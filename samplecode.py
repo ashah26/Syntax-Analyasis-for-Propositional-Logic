@@ -1,7 +1,7 @@
-from pysmt.shortcuts import  Symbol, And, Not, is_sat,Iff
-from parser import Parser
+# from pysmt.shortcuts import  Symbol, And, Not, is_sat,Iff
+# from parser import Parser
 
-parserObj = Parser()
+# parserObj = Parser()
 
 #
 # P = Symbol("P") # Default type is Boolean
@@ -12,7 +12,11 @@ parserObj = Parser()
 # print(f, Not(f))
 # print(is_sat(f))
 
-lexerlist = ['LPAR', 'ID', 'AND', 'NOT', 'ID', 'RPAR', 'COMMA', 'LPAR', 'NOT', 'ID', 'IMPLIES', 'NOT', 'ID', 'RPAR']
-postFixList = parserObj.convertToPostfix(lexerlist)
+s1 = "Ashna"
+print (s1[1:3])
+print (len('/\\ '))
 
-parserObj.checkSatisfiability(postFixList)
+# lexerlist = ['LPAR', 'ID', 'AND', 'NOT', 'ID', 'RPAR', 'COMMA', 'LPAR', 'NOT', 'ID', 'IMPLIES', 'NOT', 'ID', 'RPAR']
+# postFixList = parserObj.convertToPostfix(lexerlist)
+#
+# parserObj.checkSatisfiability(postFixList)

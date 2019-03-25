@@ -59,9 +59,12 @@ class Parser:
 
         if not self.errorflag:
             print("Parser: ", self.parserList)
+            # print("Line:" , line)
+            propositionList = self.convertInputToList(line)
+            # print ("propositionList: %s " % propositionList)
 
-            postFixList = self.convertToPostfix(self.lexerlist)
-
+            # postFixList = self.convertToPostfix(self.lexerlist)
+            postFixList = self.convertToPostfix(propositionList)
             self.checkSatisfiability(postFixList)
 
 
@@ -87,28 +90,30 @@ class Parser:
     # def push(self, op):
     #
 
-    def convertToPostfix(self, lexerlist):
+    def convertToPostfix(self, propositionlist):
         opStack = Stack()
         postfixList = []
-
-        for token in lexerlist:
-            if token == "ID":
+        p = re.compile('[a-zA-Z0-1]+')
+        for token in propositionlist:
+            if token == "ID" or p.match(token):
                 postfixList.append(token)
-            elif token == 'LPAR':
+            elif token in ['LPAR', '(']:
                 opStack.push(token)
-            elif token == 'AND':
+            elif token in ['AND', '/\\']:
                 opStack.push(token)
-            elif token == 'OR':
+            elif token in ['OR','\\/']:
                 opStack.push(token)
-            elif token == 'IFF':
+            elif token in ['IFF', '<=>']:
                 opStack.push(token)
-            elif token == 'IMPLIES':
+            elif token in ['IMPLIES', '=>']:
                 opStack.push(token)
-            elif token == 'NOT':
+            elif token in ['NOT', '!']:
                 opStack.push(token)
-            elif token == 'RPAR':
+            elif token in ['COMMA', ',']:
+                opStack.push(token)
+            elif token in ['RPAR', ')']:
                 topToken = opStack.pop()
-                while topToken != 'LPAR':
+                while topToken not in ['LPAR', '(']:
                     postfixList.append(topToken)
                     topToken = opStack.pop()
             else:
@@ -124,25 +129,25 @@ class Parser:
 
     def checkSatisfiability(self, postFixList):
         propStack = Stack()
-
+        p = re.compile('[a-zA-Z0-1]')
         for op in postFixList:
-            if op == 'ID':
+            if op == 'ID' or p.match(op):
                 propStack.push(Symbol(op))
-            elif op == 'NOT':
+            elif op in ['NOT', '!']:
                 propStack.push(Not(propStack.pop()))
-            elif op == 'AND' or op == 'COMMA':
+            elif op in ['AND', '/\\', ',', 'COMMA']:
                 p2 = propStack.pop()
                 p1 = propStack.pop()
                 propStack.push(And(p1, p2))
-            elif op == 'OR':
+            elif op in ['OR', '\\/']:
                 p2 = propStack.pop()
                 p1 = propStack.pop()
                 propStack.push(Or(p1, p2))
-            elif op == 'IFF':
+            elif op in ['IFF', '<=>']:
                 p2 = propStack.pop()
                 p1 = propStack.pop()
                 propStack.push(Iff(p1, p2))
-            elif op == 'IMPLIES':
+            elif op in ['IMPLIES', '=>']:
                 p2 = propStack.pop()
                 p1 = propStack.pop()
                 propStack.push(Implies(p1, p2))
@@ -151,10 +156,38 @@ class Parser:
 
         if propStack.size() == 1:
             p3 = propStack.pop()
-            print ("Expression for satisfiability:", p3)
+            # print ("Expression for satisfiability:", p3)
             print ("Is sat or not : ", is_sat(p3))
         else:
             print ("Error while checking Is sat or not")
+
+    def convertInputToList(self,line):
+
+        propositionList = []
+        p = re.compile('[a-zA-Z0-1]')
+        lengthOfLine = len(line)
+        c = 0
+        while c < lengthOfLine:
+            if line[c] == '!':
+                propositionList.append(line[c])
+            elif p.match(line[c]):
+                propositionList.append(line[c])
+            elif line[c]  == '=' or line[c] == '\\' or line[c] == '/':
+                if c+1 < lengthOfLine:
+                    propositionList.append(line[c:c+2])
+                    c = c+1
+            elif line[c] == '<' :
+                if c+2 < lengthOfLine:
+                    propositionList.append(line[c:c+3])
+                    c = c+2
+            elif line[c] == '('  or line[c] == ')':
+                propositionList.append(line[c])
+            elif line[c] == ',':
+                propositionList.append(line[c])
+
+            c = c+1
+
+        return propositionList
 
     def match(self, token):
 
