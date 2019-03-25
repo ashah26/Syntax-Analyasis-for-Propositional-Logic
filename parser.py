@@ -91,7 +91,7 @@ class Parser:
         opStack = Stack()
         postfixList = []
 
-        for token in self.lexerlist:
+        for token in lexerlist:
             if token == "ID":
                 postfixList.append(token)
             elif token == 'LPAR':
@@ -147,12 +147,14 @@ class Parser:
                 p1 = propStack.pop()
                 propStack.push(Implies(p1, p2))
 
+        print ("propStack size: ", propStack.size())
+
         if propStack.size() == 1:
             p3 = propStack.pop()
             print ("Expression for satisfiability:", p3)
-            print ("Iis sat or not : ", is_sat(p3))
+            print ("Is sat or not : ", is_sat(p3))
         else:
-            print ("error while checking satifiability, stack size: ", propStack.size())
+            print ("Error while checking Is sat or not")
 
     def match(self, token):
 
